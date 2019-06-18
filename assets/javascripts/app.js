@@ -1,5 +1,9 @@
 import _ from "lodash"
 
+const ON_GAME = 1
+const GAME_OVER = 0
+let gameState = ON_GAME
+
 const BLOCK_SIZE = 24
 const BLOCK_RAWS = 22
 const BLOCK_COLS = 12
@@ -63,8 +67,7 @@ const	BLOCKS =	 [
    [0, 1, 0, 0]
  ],
  [
-   [0, 0, 1, 0],
-   [0, 1, 1, 0],
+   [0, 0, 1, 0], [0, 1, 1, 0],
    [0, 1, 0, 0],
    [0, 0, 0, 0]
  ],
@@ -135,6 +138,10 @@ function createBlock() {
   blockY = oldBlockY = 0
 
   currentBlock = _.cloneDeep(BLOCKS[blockType])
+
+	if(hitCheck()){
+		gameState = GAMEOVER
+	}
 }
 
 function updateBlock () {
@@ -192,6 +199,7 @@ function loop (timestamp) {
 
   const diff = timestamp - lastUpdate
   if (diff > speed) {
+    if (gameState === GAME_OVER) return
     lastUpdate = timestamp
     clearBlock()
     blockY++
