@@ -1,7 +1,7 @@
 import _ from "lodash"
 
 const ON_GAME = 1
-const GAME_OVER = 0
+const GAMEOVER = 0
 let gameState = ON_GAME
 
 const BLOCK_SIZE = 24
@@ -28,14 +28,16 @@ let oldBlockY = 0
 
 let currentBlock = []
 
+const KEY_LEFT = 37
+const KEY_UP = 38
+const KEY_RIGHT = 39
+const KEY_DOWN = 40
+
 const STAGE = [
   [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
   [9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9],
   [9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9],
-  [9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9],
-  [9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9],
-  [9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9],
-  [9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9],
+  [9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9], [9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9], [9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9], [9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9],
   [9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9],
   [9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9],
   [9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9],
@@ -171,9 +173,7 @@ function lockBlock () {
   for (let row = 0; row < currentBlock.length; row++) {
     for (let col = 0; col  < currentBlock[row].length; col++) {
       if (currentBlock[row][col]) {
-        // console.log(currentBlock[row][col])
         if (currentBlock[row][col]) {
-          console.log(LOCK_BLOCK)
           field[row + blockY][col  + blockX] = LOCK_BLOCK
         }
       }
@@ -199,7 +199,7 @@ function loop (timestamp) {
 
   const diff = timestamp - lastUpdate
   if (diff > speed) {
-    if (gameState === GAME_OVER) return
+    if (gameState === GAMEOVER) return
     lastUpdate = timestamp
     clearBlock()
     blockY++
@@ -217,10 +217,60 @@ function loop (timestamp) {
   requestAnimationFrame(loop)
 }
 
+function rotateBlock () {
+  clearBlock()
+  const ROW = currentBlock.length
+  const COL = currentBlock[0].length
+
+  let copy = new Array(currentBlock.length)
+
+  for ( let col = 0; col < currentBlock[0].length; col++ ) {
+    copy[col] = new Array(ROW)
+
+    for (let row = 0; row <  ROW; row++) {
+      copy[col][row] = currentBlock[ROW-row-1][col]
+    }
+  }
+
+  currentBlock = copy
+}
+
+function keyHandler (e) {
+  if (gameState === GAMEOVER) return
+
+	clearBlock()
+  oldBlockX = blockX
+  oldBlockY = blockY
+
+  switch (e.keyCode) {
+    case KEY_RIGHT:
+      blockX++
+      break
+    case KEY_LEFT:
+      blockX--
+      break
+    case KEY_DOWN:
+      blockY++
+      break
+    case KEY_UP:
+      rotateBlock()
+      break
+  }
+
+  if (hitCheck()) {
+    blockX = oldBlockX
+    blockY = oldBlockY
+  }
+
+  updateBlock()
+}
+
 function init () {
   draw()
   createBlock()
   loop()
+  window.onkeydown = keyHandler
 }
+
 
 init()
