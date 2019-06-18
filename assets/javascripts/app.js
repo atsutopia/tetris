@@ -119,19 +119,50 @@ function createBlock() {
 
   // stageの中心
   blockX = Math.floor(BLOCK_COLS / 3)
-  blockY = Math.floor(BLOCK_RAWS / 3)
+  blockY = 0
 
   currentBlock = _.cloneDeep(BLOCKS[blockType])
+}
 
+function updateBlock () {
   for (let row = 0; row < currentBlock.length; row++) {
     for (let col = 0; col  < currentBlock[row].length; col++) {
-      field[row + blockY][col  + blockX] = currentBlock[row][col]
+      if (currentBlock[row][col]) {
+        field[row + blockY][col  + blockX] = currentBlock[row][col]
+      }
     }
   }
 }
 
+function clearBlock () {
+  for (let row = 0; row < currentBlock.length; row++) {
+    for (let col = 0; col  < currentBlock[row].length; col++) {
+      if (currentBlock[row][col]) {
+        if (currentBlock[row][col]) {
+          field[row + blockY][col  + blockX] = NON_BLOCK
+        }
+
+      }
+    }
+  }
+}
+
+let speed = 1500
+let lastUpdate = 0
+
 function loop (timestamp) {
-  draw()
+  const diff = timestamp - lastUpdate
+  if (diff > speed) {
+    lastUpdate = timestamp
+    clearBlock()
+    blockY++
+    updateBlock()
+    CONTEXT.fillStyle = BACK_COLOR
+    CONTEXT.fillRect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT)
+    draw()
+  }
+
+
   requestAnimationFrame(loop)
 }
 
