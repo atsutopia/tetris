@@ -60,12 +60,44 @@ const	BLOCKS = [
    [0, 0, 1, 0],
    [0, 0, 1, 0],
  ],
+ [
+   [0, 0, 1, 0],
+   [0, 1, 1, 0],
+   [0, 1, 0, 0],
+   [0, 0, 0, 0],
+ ],
+ [
+   [0, 1, 0, 0],
+   [0, 1, 1, 0],
+   [0, 0, 1, 0],
+   [0, 0, 0, 0],
+ ],
+ [
+   [0, 0, 0, 0],
+   [0, 1, 1, 0],
+   [0, 1, 0, 0],
+   [0, 1, 0, 0],
+ ],
+ [
+   [0, 0, 0, 0],
+   [0, 1, 1, 0],
+   [0, 0, 1, 0],
+   [0, 0, 1, 0],
+ ],
+ [
+   [0, 0, 0, 0],
+   [0, 1, 0, 0],
+   [1, 1, 1, 0],
+   [0, 0, 0, 0],
+ ]
 ]
 
 const KEY_LEFT = 37
 const KEY_UP = 38
 const KEY_RIGHT = 39
 const KEY_DOWN = 40
+
+const GAMEOVER = 0
 
 export default class Tetris {
   constructor (canvas) {
@@ -91,6 +123,8 @@ export default class Tetris {
     let lastUpdate = 0
 
     this.ticker = (timestamp) => {
+      if (this.mode === GAMEOVER) return
+
       this.beforeX = this.x
       this.beforeY = this.y
 
@@ -103,6 +137,7 @@ export default class Tetris {
         if (this.isHit()) {
           this.y = this.beforeY
           this.lockBlock()
+          this.deleteLine()
           this.createBlock()
         }
         this.updateBlock()
@@ -147,6 +182,10 @@ export default class Tetris {
     this.y = this.beforeY = 0
 
     this.block = _.cloneDeep(BLOCKS[blockType])
+
+    if (this.isHit()) {
+      this.mode = GAMEOVER
+    }
   }
 
   updateBlock () {
@@ -227,6 +266,23 @@ export default class Tetris {
 
     if (this.isHit()) {
       this.block = beforeBlock
+    }
+  }
+
+  deleteLine () {
+    for (let row = BLOCK_ROWS-1; row > 0; row--) {
+      const cells = _.filter(this.stage[row], (cell) => cell !== NON_BLOCK && cell !== WALL)
+
+      if (cells.length === BLOCK_COLS - 2) {
+        for (let col =1; col < BLOCK_COLS-1; col++) {
+          this.stage[row][col] = this.stage[row -1][col]
+
+          for (let topRow = row - 1; topRow > 0; topRow--) {
+            this.stage[topRow][col] = this.stage[topRow - 1][col]
+          }
+        }
+        row++
+      }
     }
   }
 }
