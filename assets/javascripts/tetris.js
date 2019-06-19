@@ -76,9 +76,31 @@ export default class Tetris {
     this.block = []
 
     this.stage = _.cloneDeep(STAGE)
+
     this.createBlock()
     this.updateBlock()
     this.draw()
+
+    const speed = 500
+    let lastUpdate = 0
+
+    this.ticker = (timestamp) => {
+      this.beforeX = this.x
+      this.beforeY = this.y
+
+      const diff = timestamp - lastUpdate
+      if (diff > speed) {
+        lastUpdate = timestamp
+        this.clearBlock()
+        this.y++
+        this.updateBlock()
+      }
+      this.draw()
+
+      requestAnimationFrame(this.ticker)
+    }
+
+    requestAnimationFrame(this.ticker)
   }
 
   draw () {
@@ -112,6 +134,14 @@ export default class Tetris {
     for (let row = 0; row < 4; row++) {
       for (let col = 0; col < 4; col++) {
         if (this.block[row][col]) this.stage[row + this.y][col + this.x] = this.block[row][col]
+      }
+    }
+  }
+
+  clearBlock () {
+    for (let row = 0; row < 4; row++) {
+      for (let col = 0; col < 4; col++) {
+        if (this.block[row][col]) this.stage[row + this.y][col + this.x] = NON_BLOCK
       }
     }
   }
