@@ -1,11 +1,11 @@
 import _ from "lodash"
 
 const BLOCK_SIZE = 24
-const BLOCK_RAWS = 22
+const BLOCK_ROWS = 22
 const BLOCK_COLS = 12
 
 const SCREEN_WIDTH = BLOCK_SIZE * BLOCK_COLS
-const SCREEN_HEIGHT = BLOCK_SIZE * BLOCK_RAWS
+const SCREEN_HEIGHT = BLOCK_SIZE * BLOCK_ROWS
 
 const NORMAL_BLOCK = 1
 const NON_BLOCK = 0
@@ -113,7 +113,7 @@ export default class Tetris {
 
     this.stage = _.cloneDeep(STAGE)
 
-    this.cells = this.getCells(BLOCK_RAWS, BLOCK_COLS)
+    this.cells = this.getCells(BLOCK_ROWS, BLOCK_COLS)
     this.blockCells = this.getCells(BLOCKS[0].length, BLOCKS[0][0].length)
 
     const speed = 500
@@ -200,7 +200,7 @@ export default class Tetris {
 
   deleteLine () {
     console.log("deleteLine")
-    for(let row = BLOCK_RAWS-1; row > 0; row--) {
+    for(let row = BLOCK_ROWS-1; row > 0; row--) {
       const cells = _.filter(this.stage[row], (cell) => cell !== NON_BLOCK && cell !== WALL)
 
       if (cells.length === BLOCK_COLS - 2) {
