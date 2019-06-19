@@ -12,7 +12,6 @@ const NON_BLOCK = 0
 const WALL = 9
 const LOCK_BLOCK = 2
 
-
 const STAGE = [
   [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
   [9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9],
