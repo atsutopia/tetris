@@ -13,10 +13,12 @@ const SCREEN_HEIGHT = BLOCK_SIZE * BLOCK_ROWS
 const NON_BLOCK = 0
 const NORMAL_BLOCK = 1
 const WALL = 9
+const LOCK_BLOCK = 2
 
 const BLOCK_COLOR = "#00ffff"
 const BACK_COLOR = "#f5f5f5"
 const WALL_COLOR = "#000000"
+const LOCK_COLOR = "#c0c0c0"
 
 const STAGE = [
   [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
@@ -93,6 +95,11 @@ export default class Tetris {
         lastUpdate = timestamp
         this.clearBlock()
         this.y++
+        if (this.isHit()) {
+          this.y = this.beforeY
+          this.lockBlock()
+          this.createBlock()
+        }
         this.updateBlock()
       }
       this.draw()
@@ -115,6 +122,9 @@ export default class Tetris {
             break
           case NORMAL_BLOCK:
             this.cxt.fillStyle = BLOCK_COLOR
+            break
+          case LOCK_BLOCK:
+            this.cxt.fillStyle = LOCK_COLOR
             break
         }
         this.cxt.fillRect(col * BLOCK_SIZE, row * BLOCK_SIZE, BLOCK_SIZE -1, BLOCK_SIZE - 1)
@@ -144,5 +154,22 @@ export default class Tetris {
         if (this.block[row][col]) this.stage[row + this.y][col + this.x] = NON_BLOCK
       }
     }
+  }
+
+  lockBlock () {
+    for (let row = 0; row < 4; row++) {
+      for (let col = 0; col < 4; col++) {
+        if (this.block[row][col]) this.stage[row + this.y][col + this.x] = LOCK_BLOCK
+      }
+    }
+  }
+
+  isHit () {
+    for (let row = 0; row < 4; row++) {
+      for (let col = 0; col < 4; col++) {
+        if (this.stage[row + this.y][col  + this.x] && this.block[row][col]) return true
+      }
+    }
+    return false
   }
 }
