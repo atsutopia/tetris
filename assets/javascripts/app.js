@@ -37,7 +37,10 @@ const STAGE = [
   [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
   [9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9],
   [9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9],
-  [9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9], [9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9], [9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9], [9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9],
+  [9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9],
+  [9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9],
+  [9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9],
+  [9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9],
   [9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9],
   [9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9],
   [9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9],
@@ -68,35 +71,36 @@ const	BLOCKS =	 [
    [0, 1, 0, 0],
    [0, 1, 0, 0]
  ],
- [
-   [0, 0, 1, 0], [0, 1, 1, 0],
-   [0, 1, 0, 0],
-   [0, 0, 0, 0]
- ],
- [
-   [0, 1, 0, 0],
-   [0, 1, 1, 0],
-   [0, 0, 1, 0],
-   [0, 0, 0, 0]
- ],
- [
-   [0, 0, 0, 0],
-   [0, 1, 1, 0],
-   [0, 1, 0, 0],
-   [0, 1, 0, 0]
- ],
- [
-   [0, 0, 0, 0],
-   [0, 1, 1, 0],
-   [0, 0, 1, 0],
-   [0, 0, 1, 0]
- ],
- [
-   [0, 0, 0, 0],
-   [0, 1, 0, 0],
-   [1, 1, 1, 0],
-   [0, 0, 0, 0]
- ]
+ // [
+ //   [0, 0, 1, 0]
+ //   [0, 1, 1, 0],
+ //   [0, 1, 0, 0],
+ //   [0, 0, 0, 0]
+ // ],
+ // [
+ //   [0, 1, 0, 0],
+ //   [0, 1, 1, 0],
+ //   [0, 0, 1, 0],
+ //   [0, 0, 0, 0]
+ // ],
+ // [
+ //   [0, 0, 0, 0],
+ //   [0, 1, 1, 0],
+ //   [0, 1, 0, 0],
+ //   [0, 1, 0, 0]
+ // ],
+ // [
+ //   [0, 0, 0, 0],
+ //   [0, 1, 1, 0],
+ //   [0, 0, 1, 0],
+ //   [0, 0, 1, 0]
+ // ],
+ // [
+ //   [0, 0, 0, 0],
+ //   [0, 1, 0, 0],
+ //   [1, 1, 1, 0],
+ //   [0, 0, 0, 0]
+ // ]
 ]
 
 const canvas = document.getElementById("canvas")
@@ -121,7 +125,6 @@ function draw() {
           break
         case LOCK_BLOCK:
           CONTEXT.fillStyle = LOCK_COLOR
-          console.log('lock')
           break;
         case WALL:
           CONTEXT.fillStyle = WALL_COLOR
@@ -181,6 +184,25 @@ function lockBlock () {
   }
 }
 
+function lineCheck () {
+  if (gameState === GAMEOVER) return
+
+  for(let row = BLOCK_RAWS-1; row > 0; row--){
+    const cells = _.filter(field[row], (cell) => cell !== NON_BLOCK && cell !== WALL)
+
+    if (cells.length === BLOCK_COLS - 2) {
+      for (let col =1; col < BLOCK_COLS-1; col++) {
+        field[row][col] = field[row -1][col]
+
+        for (let topRow = row - 1; topRow > 0; topRow--) {
+          field[topRow][col] = field[topRow - 1][col]
+        }
+      }
+      row++
+    }
+  }
+}
+
 function hitCheck () {
   for (let row = 0; row < currentBlock.length; row++) {
     for (let col = 0; col  < currentBlock[row].length; col++) {
@@ -206,13 +228,12 @@ function loop (timestamp) {
     if (hitCheck()) {
       blockY = oldBlockY
       lockBlock()
+      lineCheck()
       createBlock()
     }
     updateBlock()
-
-    draw()
   }
-
+  draw()
 
   requestAnimationFrame(loop)
 }
