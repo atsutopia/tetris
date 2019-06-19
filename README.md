@@ -1,4 +1,4 @@
-## tetris with ES2015
+## 📱 TETRIS with ES2015
 
 Total 304 lines
 
@@ -8,6 +8,8 @@ $ wc assets/javascripts/**                                                      
      301    1012    6596 assets/javascripts/tetris.js
      304    1022    6695 total
 ```
+
+![gif](./images/cap.gif)
 
 ## Usage
 
