@@ -62,6 +62,10 @@ const	BLOCKS = [
  ],
 ]
 
+const KEY_LEFT = 37
+const KEY_UP = 38
+const KEY_RIGHT = 39
+const KEY_DOWN = 40
 
 export default class Tetris {
   constructor (canvas) {
@@ -93,6 +97,7 @@ export default class Tetris {
       const diff = timestamp - lastUpdate
       if (diff > speed) {
         lastUpdate = timestamp
+
         this.clearBlock()
         this.y++
         if (this.isHit()) {
@@ -108,6 +113,10 @@ export default class Tetris {
     }
 
     requestAnimationFrame(this.ticker)
+
+    window.addEventListener("keydown", (evt) => {
+      this.keyHandler(evt)
+    })
   }
 
   draw () {
@@ -171,5 +180,53 @@ export default class Tetris {
       }
     }
     return false
+  }
+
+  keyHandler (e) {
+    this.clearBlock()
+    this.beforeX = this.x
+    this.beforeY = this.y
+
+    switch (e.keyCode) {
+      case KEY_RIGHT:
+        this.x++
+        break
+      case KEY_LEFT:
+        this.x--
+        break
+      case KEY_DOWN:
+        this.y++
+        break
+      case KEY_UP:
+        this.rotateBlock()
+        break
+    }
+
+    if (this.isHit()) {
+      this.x = this.beforeX
+      this.y = this.beforeY
+    }
+
+    this.updateBlock()
+  }
+
+  rotateBlock () {
+    this.clearBlock()
+
+    const beforeBlock = _.cloneDeep(this.block)
+    const copy = new Array(this.block)
+
+    for (let col = 0; col < 4; col++) {
+      copy[col] = new Array(4)
+
+      for (let row = 0; row < 4; row++) {
+        copy[col][row] = this.block[3-row][col]
+      }
+    }
+    this.block = copy
+
+    if (this.isHit()) {
+      this.block = beforeBlock
+    }
   }
 }
