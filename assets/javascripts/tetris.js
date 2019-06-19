@@ -11,8 +11,10 @@ const SCREEN_WIDTH = BLOCK_SIZE * BLOCK_COLS
 const SCREEN_HEIGHT = BLOCK_SIZE * BLOCK_ROWS
 
 const NON_BLOCK = 0
+const NORMAL_BLOCK = 1
 const WALL = 9
 
+const BLOCK_COLOR = "#00ffff"
 const BACK_COLOR = "#f5f5f5"
 const WALL_COLOR = "#000000"
 
@@ -43,13 +45,39 @@ const STAGE = [
   [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
 ]
 
+const	BLOCKS = [
+  [
+    [0, 0, 0, 0],
+    [0, 1, 1, 0],
+    [0, 1, 1, 0],
+    [0, 0, 0, 0],
+ ],
+ [
+   [0, 0, 1, 0],
+   [0, 0, 1, 0],
+   [0, 0, 1, 0],
+   [0, 0, 1, 0],
+ ],
+]
+
+
 export default class Tetris {
   constructor (canvas) {
     canvas.width = SCREEN_WIDTH
     canvas.height = SCREEN_HEIGHT
     this.cxt = canvas.getContext("2d")
 
+
+    this.x = 0
+    this.y = 0
+    this.beforeX = 0
+    this.beforeY = 0
+
+    this.block = []
+
     this.stage = _.cloneDeep(STAGE)
+    this.createBlock()
+    this.updateBlock()
     this.draw()
   }
 
@@ -63,8 +91,27 @@ export default class Tetris {
           case WALL:
             this.cxt.fillStyle = WALL_COLOR
             break
+          case NORMAL_BLOCK:
+            this.cxt.fillStyle = BLOCK_COLOR
+            break
         }
         this.cxt.fillRect(col * BLOCK_SIZE, row * BLOCK_SIZE, BLOCK_SIZE -1, BLOCK_SIZE - 1)
+      }
+    }
+  }
+
+  createBlock () {
+    const blockType = Math.floor(Math.random() * BLOCKS.length)
+    this.x = this.beforeX = Math.floor(BLOCK_COLS / 3)
+    this.y = this.beforeY = 0
+
+    this.block = _.cloneDeep(BLOCKS[blockType])
+  }
+
+  updateBlock () {
+    for (let row = 0; row < 4; row++) {
+      for (let col = 0; col < 4; col++) {
+        if (this.block[row][col]) this.stage[row + this.y][col + this.x] = this.block[row][col]
       }
     }
   }
